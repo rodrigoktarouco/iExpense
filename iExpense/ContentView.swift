@@ -15,7 +15,10 @@ struct ContentView: View {
         NavigationView {
             VStack {
                 List {
-                    ForEach(expenses.items) { item in
+                    Text("Personal")
+                        .foregroundColor(.black)
+                        .font(.title)
+                    ForEach(expenses.personalItems) { item in
                         HStack {
                             VStack(alignment: .leading) {
                                 Text(item.name)
@@ -23,10 +26,40 @@ struct ContentView: View {
                                 Text(item.type)
                             }
                             Spacer()
-                            Text(item.amount, format: .currency(code: "USD"))
+                            switch item.amount {
+                            case 0...10.0:
+                                Text(item.amount, format: .currency(code: "\(item.chosenCurrency)")).foregroundColor(.blue)
+                            case 10.0...100.0:
+                                Text(item.amount, format: .currency(code: "\(item.chosenCurrency)")).foregroundColor(.yellow)
+                            default:
+                                Text(item.amount, format: .currency(code: "\(item.chosenCurrency)")).foregroundColor(.red)
+                            }
+                            
                         }
                     }
-                    .onDelete(perform: removeItems)
+                    .onDelete(perform: removePersonalItems)
+                    Text("Business")
+                        .foregroundColor(.black)
+                        .font(.title)
+                    ForEach(expenses.businessItems) { item in
+                        HStack {
+                            VStack(alignment: .leading) {
+                                Text(item.name)
+                                    .font(.headline)
+                                Text(item.type)
+                            }
+                            Spacer()
+                            switch item.amount {
+                            case 0...10.0:
+                                Text(item.amount, format: .currency(code: "\(item.chosenCurrency)")).foregroundColor(.blue)
+                            case 10.0...100.0:
+                                Text(item.amount, format: .currency(code: "\(item.chosenCurrency)")).foregroundColor(.yellow)
+                            default:
+                                Text(item.amount, format: .currency(code: "\(item.chosenCurrency)")).foregroundColor(.red)
+                            }
+                        }
+                    }
+                    .onDelete(perform: removeBusinessItems)
                     
                 }
                 .navigationTitle("iExpense")
@@ -38,14 +71,17 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $showingAddExpense) {
-                    AddView(expenses: expenses)
-                }
+                AddView(expenses: expenses)
+            }
         }
-        
     }
-
-    func removeItems(at offsets: IndexSet) {
-        expenses.items.remove(atOffsets: offsets)
+    
+    func removePersonalItems(at offsets: IndexSet) {
+        expenses.personalItems.remove(atOffsets: offsets)
+    }
+    
+    func removeBusinessItems(at offsets: IndexSet) {
+        expenses.businessItems.remove(atOffsets: offsets)
     }
 }
 
